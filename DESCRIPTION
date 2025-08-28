@@ -1,7 +1,7 @@
 Package: overshiny
 Type: Package
 Title: Interactive Overlays on 'shiny' Plots
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person(
       "Nick", "Davies",
@@ -18,14 +18,14 @@ URL: https://github.com/nicholasdavies/overshiny,
         https://nicholasdavies.github.io/overshiny/
 BugReports: https://github.com/nicholasdavies/overshiny/issues
 RoxygenNote: 7.3.2
-Imports: ggplot2, graphics, grDevices, grid, htmltools, shiny, shinyjs,
-        shinyjqui, stringr
+Imports: cowplot, ggplot2, graphics, grDevices, grid, htmltools, shiny,
+        shinyjs, shinyjqui, stringr
 Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2025-07-21 22:42:33 UTC; nick
+Packaged: 2025-08-28 22:52:05 UTC; nick
 Author: Nick Davies [aut, cre, cph]
 Maintainer: Nick Davies <nicholas.davies@lshtm.ac.uk>
 Repository: CRAN
-Date/Publication: 2025-07-22 12:00:02 UTC
+Date/Publication: 2025-08-28 23:10:02 UTC
