@@ -4,10 +4,10 @@
 \alias{overlayToken}
 \title{Create an overlay token input control}
 \usage{
-overlayToken(inputId, name, label = name)
+overlayToken(id, name, label = name)
 }
 \arguments{
-\item{inputId}{The \code{input} slot used for the token.}
+\item{id}{A unique ID for the token (a character string without spaces).}
 
 \item{name}{Text (or HTML) to be displayed on the token itself.}
 
@@ -17,12 +17,12 @@ overlayToken(inputId, name, label = name)
 An overlay token input control that can be added to a UI definition.
 }
 \description{
-Create a token that can be dragged onto an (overlay plot)\code{\link[=overlayPlotOutput]{overlayPlotOutput()}}
+Create a token that can be dragged onto an \link[=overlayPlotOutput]{overlay plot}
 to create a new overlay.
 }
 \details{
 Note that the DOM ID of the token will be converted to
-\code{"overshiny_token_<inputId>"}. This transformed ID is important for internal
+\code{"overshiny_token_<id>"}. This transformed ID is important for internal
 interaction logic (e.g. for use with JavaScript drag/drop handlers). When
 referencing the token programmatically (e.g. in CSS selectors or custom
 JavaScript), use the full prefixed ID (see examples).

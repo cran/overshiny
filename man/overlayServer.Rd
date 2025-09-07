@@ -8,7 +8,11 @@ overlayServer(
   outputId,
   nrect,
   width = NULL,
-  snap = "none",
+  data = NULL,
+  snap = NULL,
+  heading = NULL,
+  select = NULL,
+  menu = NULL,
   colours = overlayColours,
   opacity = 0.25,
   icon = shiny::icon("gear"),
@@ -25,9 +29,25 @@ overlayServer(
 \item{width}{Optional default overlay width in plot coordinates. If \code{NULL}
 (default), set to 10\% of the plot width.}
 
-\item{snap}{Function to "snap" overlay coordinates to a grid, or \code{"none"}
+\item{data}{Named list of custom overlay-specific properties to be edited in
+the overlay dropdown menu.}
+
+\item{snap}{Function to "snap" overlay coordinates to a grid, or \code{NULL}
 (default) for no snapping. See details for how to specify the snap
-function.}
+function; you can also use the built-in \code{\link[=snapGrid]{snapGrid()}}.}
+
+\item{heading}{Function to provide a heading for the overlay dropdown menus,
+or \code{NULL} (default) for no heading. See details for how to specify the
+heading function; you can also use the built-in \code{\link[=rangeHeading]{rangeHeading()}} or
+\code{\link[=dateHeading]{dateHeading()}}.}
+
+\item{select}{If you want to allow users to change the type (i.e. label) of
+the overlay from the overlay dropdown menu, set this to \code{TRUE} to
+provide a select input with all labels or a character vector with
+permissible choices. \code{NULL} (default) to omit this feature.}
+
+\item{menu}{Function to provide additional UI elements on the overlay
+dropdown menu. See details for how to specify the menu function.}
 
 \item{colours}{A function to assign custom colours to the overlays. Should
 be a function that takes a single integer (the number of overlays) and
@@ -51,26 +71,29 @@ debugging purposes.}
 }
 \value{
 A \code{\link[shiny:reactiveValues]{shiny::reactiveValues()}} object with the following named fields:
-\describe{
-\item{n}{Number of overlays (read-only).}
-\item{active}{Logical vector of length \code{n}; indicates which overlays are active.}
-\item{show}{Logical vector; controls whether overlays are visible.}
-\item{editing}{Index of the overlay currently being edited via the
-dropdown menu, if any; \code{NA} otherwise (read-only).}
-\item{last}{Index of the most recently added overlay (read-only).}
-\item{snap}{Coordinate snapping function.}
-\item{px, pw}{Numeric vector; overlay x-position and width in pixels (see note).}
-\item{py, ph}{Numeric vector; overlay y-position and height in pixels (read-only).}
-\item{cx0, cx1}{Numeric vector; overlay x-bounds in plot coordinates (see note).}
-\item{label}{Character vector of labels shown at the top of each overlay.}
-\item{outputId}{The output ID of the plot display area (read-only).}
-\item{bound_cx, bound_cw}{x-position and width of the bounding area in plot coordinates (read-only).}
-\item{bound_px, bound_pw}{x-position and width of the bounding area in pixels (read-only).}
-\item{bound_py, bound_ph}{y-position and height of the bounding area in pixels (read-only).}
-\item{stagger}{Amount of vertical staggering, as proportion of height.}
-\item{style}{Named list of character vectors; additional styling for rectangular overlays.}
-\item{update_cx(i)}{Function to update \code{cx0}/\code{cx1} from \code{px}/\code{pw} for overlays \code{i} (see note).}
-\item{update_px(i)}{Function to update \code{px}/\code{pw} from \code{cx0}/\code{cx1} for overlays \code{i} (see note).}
+\tabular{ll}{
+\code{n} \tab Number of overlays (read-only). \cr
+\code{show} \tab \code{TRUE}/\code{FALSE}; controls whether overlays are visible. \cr
+\code{active} \tab Logical vector of length \code{n}; indicates which overlays are active. \cr
+\code{label} \tab Character vector of labels shown at the top of each overlay. \cr
+\code{data} \tab Custom data for each overlay, to be edited via the dropdown menu. \cr
+\code{editing} \tab Index of the overlay currently being edited via the dropdown menu; \code{NA} if none (read-only). \cr
+\code{last} \tab Index of the most recently added overlay (read-only). \cr
+\code{snap} \tab Coordinate snapping function. \cr
+\code{heading} \tab Heading function for the dropdown menu. \cr
+\code{select} \tab Overlay label select options for the dropdown menu. \cr
+\code{menu} \tab Function to provide additional UI elements for the dropdown menu. \cr
+\code{px,pw} \tab Numeric vector; overlay x-position and width in pixels (see note). \cr
+\code{py,ph} \tab Numeric vector; overlay y-position and height in pixels (read-only). \cr
+\code{cx0,cx1} \tab Numeric vector; overlay x-bounds in plot coordinates (see note). \cr
+\code{outputId} \tab The output ID of the plot display area (read-only). \cr
+\code{bound_cx, bound_cw} \tab x-position and width of the bounding area in plot coordinates (read-only). \cr
+\code{bound_px, bound_pw} \tab x-position and width of the bounding area in pixels (read-only). \cr
+\code{bound_py, bound_ph} \tab y-position and height of the bounding area in pixels (read-only). \cr
+\code{stagger} \tab Amount of vertical staggering, as proportion of height. \cr
+\code{style} \tab Named list of character vectors; additional styling for rectangular overlays. \cr
+\code{update_cx(i)} \tab Function to update \code{cx0}/\code{cx1} from \code{px}/\code{pw} for overlays \code{i} (see note). \cr
+\code{update_px(i)} \tab Function to update \code{px}/\code{pw} from \code{cx0}/\code{cx1} for overlays \code{i} (see note).
 }
 
 Note: Fields marked "read-only" above should not be changed. Other fields can
@@ -100,15 +123,12 @@ resize, and dropdown menu actions, and allows adding new overlays by
 dragging an \code{\link[=overlayToken]{overlayToken()}} onto the plot. The function returns a
 \code{\link[shiny:reactiveValues]{shiny::reactiveValues()}} object which you should keep for further use; in
 the examples and documentation, this object is typically called \code{ov}.
+}
+\section{\code{snap} parameter}{
 
-This function also defines a dynamic output UI slot with ID
-\code{paste0(outputId, "_menu")}, which can be rendered using \code{\link[shiny:renderUI]{shiny::renderUI()}}.
-When a user clicks the overlay's dropdown icon, this menu becomes visible
-and can be populated with inputs for editing overlay-specific settings, e.g.
-labels or numeric parameters tied to that overlay.
 
-If you provide a coordinate snapping function (\code{snap} argument), it should
-have the signature \verb{function(ov, i)} where \code{ov} is the
+If you provide your own coordinate snapping function (\code{snap} argument), it
+should have the signature \verb{function(ov, i)} where \code{ov} is the
 \code{\link[shiny:reactiveValues]{shiny::reactiveValues()}} object defining the overlays and their settings,
 and \code{i} is the set of indices for the rectangles to be updated. When the
 position of any of the overlays is changed, the snapping function will be
@@ -122,47 +142,82 @@ the x axis range of the plot changes, so it may be a good idea to provide
 one if the user might place an overlay onto the plot, but then change the x
 axis range of the plot such that the overlay is no longer visible. You can
 detect this by verifying whether the overlay rectangles are "out of bounds"
-at the top of your snapping function. See example below.
+at the top of your snapping function. See the code for \code{\link[=snapGrid]{snapGrid()}} for
+ideas.
 }
+
+\section{Overlay dropdown menu}{
+
+
+Overlays have a little icon in the top-right corner (by default, a gear).
+When the user clicks on this icon, a dropdown menu appears that allows the
+user to remove the overlay. You can also provide additional components for
+this dropdown menu by using the \code{heading}, \code{select}, and \code{menu} parameters
+to \code{\link[=overlayServer]{overlayServer()}}.
+
+\strong{\code{heading}}: This should be a function with the signature \verb{function(ov, i)}
+where \code{ov} is the \code{\link[shiny:reactiveValues]{shiny::reactiveValues()}} object defining the overlays and
+their settings, and \code{i} is the (single) index for the current overlay. The
+function should return a character string that will be used as the heading
+on thedropdown menu. This can be used to e.g. report the precise start and
+end point of the overlay, which may be useful to your users. The built-in
+functions \code{\link[=rangeHeading]{rangeHeading()}} and \code{\link[=dateHeading]{dateHeading()}} can be used for numeric
+values and date values on the x-axis, respectively. Or you can use \code{NULL}
+for no heading on the dropdown menu.
+
+\strong{\code{select}}: This can be \code{TRUE} to provide a \code{\link[shiny:selectInput]{shiny::selectInput()}} widget
+on the dropdown menu that users can use to change the type (i.e. label) of
+the current overlay. Or you can provide a character vector to restrict the
+widget to specific labels, or use \code{NULL} to omit this widget.
+
+\strong{\code{menu}}: This can be a function with the signature \verb{function(ov, i)}
+where \code{ov} is the \code{\link[shiny:reactiveValues]{shiny::reactiveValues()}} object defining the overlays and
+their settings, and \code{i} is the (single) index for the current overlay. It
+should return UI component(s) (if multiple components, wrapped in a \code{list}
+or \code{tagList}) that will be inserted into the dropdown menu. If you give the
+input widgets special IDs, the user can use those input widgets to directly
+modify certain properties of the overlays:
+
+\tabular{ll}{
+\strong{\code{inputId}} \tab \strong{Modifies} \cr
+\code{*_label} \tab The label of the overlay currently being edited. \cr
+\code{*_cx0} \tab Starting x-coordinate of overlay. \cr
+\code{*_cx1} \tab Ending x-coordinate of overlay. \cr
+\code{*_cx} \tab X-position of overlay; this is like \code{cx0}, but also updates \code{cx1} to keep the same width. \cr
+\code{*_cw} \tab Width of overlay; this adjusts \code{cx1} so that the overlay has the given width. \cr
+\code{*_XYZ} \tab The corresponding entry "XYZ" in \code{data} for the overlay being edited. \cr
+\tab Note: above, \code{*} stands for the \code{outputId} argument to \code{overlayServer()}.
+}
+
+See examples for an illustration of this.
+}
+
 \examples{
-# Example of a valid snapping function: snap to nearest round number and
-# make sure the overlay is at least 2 units wide.
-mysnap <- function(ov, i) {
-    # remove any "out of bounds" overlays
-    oob <- seq_len(ov$n) \%in\% i &
-        (ov$cx0 < ov$bound_cx | ov$cx1 > ov$bound_cx + ov$bound_cw)
-    ov$active[oob] <- FALSE
-
-    # adjust position and with
-    widths <- pmax(2, round(ov$cx1[i] - ov$cx0[i]))
-    ov$cx0[i] <- pmax(round(ov$bound_cx),
-        pmin(round(ov$bound_cx + ov$bound_cw) - widths, round(ov$cx0[i])))
-    ov$cx1[i] <- pmin(round(ov$bound_cx + ov$bound_cw), ov$cx0[i] + widths)
-}
-
 ui <- shiny::fluidPage(
-    useOverlay(),
     overlayPlotOutput("my_plot", 640, 480),
     overlayToken("add", "Raise")
     # further UI elements here . . .
 )
 
 server <- function(input, output) {
-    ov <- overlayServer("my_plot", 4, 1, snap = mysnap)
+    menu <- function(ov, i) {
+        sliderInput("my_plot_amount", "Raise amount",
+               value = ov$data$amount[i], min = 0, max = 1)
+    }
 
-    output$my_plot_menu <- renderUI({
-        i <- req(ov$editing)
-        textInput("label_input", "Overlay label", value = ov$label[i])
-    })
-
-    observeEvent(input$label_input, {
-        i <- req(ov$editing)
-        ov$label[i] <- input$label_input
-    })
+    ov <- overlayServer("my_plot", 4, 1,
+        data = list(amount = 0.2),
+        snap = snapGrid(step = 0.1),
+        heading = rangeHeading(digits = 3),
+        menu = menu)
 
     output$my_plot <- shiny::renderPlot({
         df <- data.frame(x = seq(0, 2 * pi, length.out = 200))
-        df$y <- sin(df$x) + 0.1 * sum(ov$active * (df$x > ov$cx0 & df$x < ov$cx1))
+        df$y <- (1 + sin(df$x)) / 2
+        for (i in which(ov$active)) {
+            xi <- (df$x >= ov$cx0[i] & df$x <= ov$cx1[i])
+            df$y[xi] <- df$y[xi] + ov$data$amount[i]
+        }
         plot(df, type = "l")
         overlayBounds(ov, "base")
     })

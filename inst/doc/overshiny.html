@@ -376,7 +376,7 @@ will appear:</p>
 <span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a></span>
 <span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>        <span class="fu">mainPanel</span>(</span>
 <span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>            <span class="co"># Main plot with support for overlays</span></span>
-<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a>            <span class="fu">overlayPlotOutput</span>(<span class="st">&quot;plot&quot;</span>, <span class="at">width =</span> <span class="st">&quot;100%&quot;</span>, <span class="at">height =</span> <span class="dv">300</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a>            <span class="fu">overlayPlotOutput</span>(<span class="st">&quot;display&quot;</span>, <span class="at">width =</span> <span class="st">&quot;100%&quot;</span>, <span class="at">height =</span> <span class="dv">300</span>)</span>
 <span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a>        )</span>
 <span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a>    )</span>
 <span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a>)</span></code></pre></div>
@@ -391,144 +391,137 @@ the overlays:</p>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="co"># --- OVERLAY SETUP ---</span></span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a></span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>    <span class="co"># Initialise 8 draggable/resizable overlays</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    ov <span class="ot">&lt;-</span> <span class="fu">overlayServer</span>(<span class="st">&quot;plot&quot;</span>, <span class="dv">8</span>, <span class="at">width =</span> <span class="dv">56</span>) <span class="co"># 56 days = 8 weeks default width</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>    <span class="co"># Reactive values to store custom per-overlay settings</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>    opt <span class="ot">&lt;-</span> <span class="fu">reactiveValues</span>(</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>        <span class="at">type =</span> <span class="fu">rep</span>(<span class="st">&quot;Grow&quot;</span>, <span class="dv">8</span>),        <span class="co"># type of overlay action</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>        <span class="at">strength =</span> <span class="fu">rep</span>(<span class="dv">50</span>, <span class="dv">8</span>)         <span class="co"># strength as a percentage</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>    )</span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>    <span class="co"># Toggle overlay visibility based on checkbox</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>    <span class="fu">observe</span>({</span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>        ov<span class="sc">$</span>show <span class="ot">&lt;-</span> <span class="fu">isTRUE</span>(input<span class="sc">$</span>show_overlays)</span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>    })</span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>    </span></code></pre></div>
-<p>The call to <code>overlayServer()</code> initializes (up to) 8
-overlays that we can use. It also sets the default width of new overlays
-to 56, which is in plot coordinates. We’ll be plotting a time series, so
-this means 56 days (8 weeks).</p>
-<p>Then we create <code>opt</code>, a <code>reactiveValues()</code>
-object that we will use to store additional properties of the overlays.
-Here we’re going to keep track of a “type” for each overlay (“Grow” or
-“Shrink”) as well as a “strength” for each overlay (in percent).</p>
-<p>Finally, we start with some of the reactive logic of the overlays. We
-have a checkbox in our UI to control whether the overlays are shown or
-not, and the call to <code>observe()</code> makes the overlays show or
-hide based on the value of this checkbox.</p>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    ov <span class="ot">&lt;-</span> <span class="fu">overlayServer</span>(<span class="st">&quot;display&quot;</span>, <span class="dv">8</span>, <span class="at">width =</span> <span class="dv">56</span>, <span class="co"># 56 days = 8 weeks default width</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">list</span>(<span class="at">strength =</span> <span class="dv">50</span>), <span class="at">snap =</span> <span class="fu">snapGrid</span>(),</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>        <span class="at">heading =</span> <span class="fu">dateHeading</span>(<span class="st">&quot;%b %e&quot;</span>), <span class="at">select =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>    <span class="co"># Toggle overlay visibility based on checkbox</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>    <span class="fu">observe</span>({</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>        ov<span class="sc">$</span>show <span class="ot">&lt;-</span> <span class="fu">isTRUE</span>(input<span class="sc">$</span>show_overlays)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>    })</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>    </span></code></pre></div>
+<p>The call to <code>overlayServer()</code> takes as its first argument
+the ID of the <code>overlayPlotOutput()</code> from the UI. Here, we
+initialize (up to) 8 overlays that we can use. We also set the default
+width of new overlays to 56, which is in plot coordinates. We’ll be
+plotting a time series, so this means 56 days (8 weeks).</p>
+<p>The <code>data</code> argument to <code>overlayServer()</code> is a
+list of additional attributes to be associated with each overlay. Here
+we’re specifying that each overlay will have an associated
+<code>strength</code> attribute, which we’ll use to determine how much
+each overlay affects the output. We also use
+<code>snap = snapGrid()</code> to specify a snapping function; the
+default parameters for <code>snapGrid()</code> ensure that each
+overlay’s position and width is snapped to the nearest whole number.</p>
+<p>The next two arguments to <code>overlayServer()</code> relate to the
+overlay dropdown menus. Each overlay automatically has a dropdown menu
+for adjusting settings for the overlay. By default, this only includes a
+“remove” button that can be used to remove the overlay. But we can add
+additional components to the dropdown in the call to
+<code>overlayServer()</code>.</p>
+<p>The <code>heading</code> argument to <code>overlayServer()</code>
+allows us to add a small heading to the top of each overlay’s dropdown
+menu; we are using the built-in <code>dateHeading()</code> function here
+to specify the format of the heading. In this case, <code>&quot;%b %e&quot;</code>
+translates to the abbreviated month name followed by the day of the
+month. So, for example, if the overlay extends over the x-axis range 1st
+January to 28th February, the heading will show
+<code>&quot;Jan 1 – Feb 28&quot;</code>. Finally, the <code>select = TRUE</code>
+argument means that each dropdown menu will also allow us to change the
+type of the overlay, i.e. <code>&quot;Grow&quot;</code> or
+<code>&quot;Shrink&quot;</code>.</p>
+<p>After the call to <code>overlayServer()</code>, we start with some of
+the reactive logic of the overlays. We have a checkbox in our UI to
+control whether the overlays are shown or not, and the call to
+<code>observe()</code> makes the overlays show or hide based on the
+value of this checkbox.</p>
 <p>Continuing on:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>    <span class="co"># --- OVERLAY DROPDOWN MENU ---</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>    <span class="co"># Render dropdown menu when an overlay is being edited</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>    output<span class="sc">$</span>plot_menu <span class="ot">&lt;-</span> <span class="fu">renderUI</span>({</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>        i <span class="ot">&lt;-</span> <span class="fu">req</span>(ov<span class="sc">$</span>editing)  <span class="co"># Current overlay being edited</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>        <span class="fu">tagList</span>(</span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>            <span class="fu">textOutput</span>(<span class="st">&quot;dates&quot;</span>),</span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>            <span class="fu">selectInput</span>(<span class="st">&quot;type&quot;</span>, <span class="cn">NULL</span>, <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">&quot;Grow&quot;</span>, <span class="st">&quot;Shrink&quot;</span>), <span class="at">selected =</span> ov<span class="sc">$</span>label[i]),</span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>            <span class="fu">sliderInput</span>(<span class="st">&quot;strength&quot;</span>, <span class="st">&quot;Strength&quot;</span>, <span class="at">min =</span> <span class="dv">0</span>, <span class="at">max =</span> <span class="dv">100</span>, <span class="at">value =</span> opt<span class="sc">$</span>strength[i])</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>        )</span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>    })</span></code></pre></div>
-<p>Each overlay automatically has a dropdown menu for adjusting settings
-for the overlay. By default, this only includes a “remove” button that
-can be used to remove the overlay. But we can add extra elements to
-these menus by using <code>renderUI()</code>.</p>
-<p>Since we created an <code>overlayPlotOutput()</code> with the output
-ID <code>&quot;plot&quot;</code>, <code>overshiny</code> has also created a UI
-output slot named <code>&quot;plot_menu&quot;</code> which is used to add extra
-elements to each overlay’s dropdown menu. For our purposes, we’ll
-include a <code>textOutput()</code> element which shows the date range
-for the overlay, a <code>selectInput()</code> to choose between “Grow”
-and “Shrink” type overlays, and a <code>sliderInput()</code> to choose
-the percentage “strength” associated with the overlay.</p>
-<p>The line <code>i &lt;- req(ov$editing)</code> just gets the index (1
-to 8) of the current overlay being edited. The call to
-<code>req()</code> ensures that the rest of the code in the
-<code>renderUI()</code> call won’t be run unless there is an overlay
-currently being edited via its dropdown menu.</p>
-<p>Note that above, each overlay has the same elements in its dropdown
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>    ov<span class="sc">$</span>menu <span class="ot">&lt;-</span> <span class="cf">function</span>(ov, i) {</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>        <span class="fu">list</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>            <span class="fu">sliderInput</span>(<span class="st">&quot;display_strength&quot;</span>, <span class="st">&quot;Strength&quot;</span>, <span class="at">min =</span> <span class="dv">0</span>, <span class="at">max =</span> <span class="dv">100</span>, <span class="at">value =</span> ov<span class="sc">$</span>data<span class="sc">$</span>strength[i]),</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>            <span class="fu">dateInput</span>(<span class="st">&quot;display_cx&quot;</span>, <span class="st">&quot;Start date&quot;</span>, <span class="at">value =</span> ov<span class="sc">$</span>cx0[i]),</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>            <span class="fu">sliderInput</span>(<span class="st">&quot;display_cw&quot;</span>, <span class="st">&quot;Duration&quot;</span>, <span class="at">min =</span> <span class="dv">1</span>, <span class="at">max =</span> <span class="fu">floor</span>(ov<span class="sc">$</span>bound_cw), <span class="at">value =</span> ov<span class="sc">$</span>cx1[i] <span class="sc">-</span> ov<span class="sc">$</span>cx0[i])</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>        )</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>    }</span></code></pre></div>
+<p>Here, we add some additional, custom components to the overlay
+dropdown menu by assigning a function to the variable
+<code>ov$menu</code>. We can also pass this function in as the
+<code>menu</code> argument to <code>overlayServer()</code>, but the two
+approaches are equivalent here.</p>
+<p>For our purposes, we’ll add a <code>sliderInput()</code> to choose
+the percentage “strength” associated with the overlay. We also allow the
+user to manually enter the start date of each overlay
+(<code>&quot;display_cx&quot;</code>) and the width of each overlay
+(<code>&quot;display_cw&quot;</code>). Here, <code>&quot;display_cx&quot;</code> and
+<code>&quot;display_cw&quot;</code> will automatically set the position and width
+of each overlay because <code>&quot;cx&quot;</code> and <code>&quot;cw&quot;</code> are
+interpreted specially by <code>overshiny</code>. <code>&quot;strength&quot;</code>
+doesn’t have any special interpretation so it will be applied to
+<code>ov$data$strength</code>. Note that the IDs of all these UI widgets
+start with <code>&quot;display_&quot;</code> because we gave our
+<code>overlayPlotOutput()</code> the ID <code>&quot;display&quot;</code> in the
+UI. See the documentation for <code>overlayServer()</code> for more
+details.</p>
+<p>It’s important here to set the “starting value” for each of the three
+custom input widgets using values from the <code>ov</code> object. If we
+just supplied some “default” value for each of these, this value would
+reset each time we opened the dropdown menu.</p>
+<p>In this example, each overlay has the same elements in its dropdown
 menu, but we could choose to return different contents for the dropdown
-menu depending on which overlay is being edited.</p>
-<p>Now let’s fill in some extra logic around those dropdown menus.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>    <span class="co"># Display date range for the currently edited overlay</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>    output<span class="sc">$</span>dates <span class="ot">&lt;-</span> <span class="fu">renderText</span>({</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>        i <span class="ot">&lt;-</span> <span class="fu">req</span>(ov<span class="sc">$</span>editing)</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>        fmt <span class="ot">&lt;-</span> <span class="cf">function</span>(t) <span class="fu">format</span>(<span class="fu">as.Date</span>(<span class="fu">round</span>(t), <span class="at">origin =</span> <span class="st">&quot;1970-01-01&quot;</span>), <span class="st">&quot;%b %d&quot;</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>        <span class="fu">paste</span>(<span class="fu">fmt</span>(ov<span class="sc">$</span>cx0[i]), <span class="st">&quot;–&quot;</span>, <span class="fu">fmt</span>(ov<span class="sc">$</span>cx1[i]))</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>    })</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>    <span class="co"># Update stored strength when the slider changes</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>    <span class="fu">observeEvent</span>(input<span class="sc">$</span>strength, {</span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>        i <span class="ot">&lt;-</span> <span class="fu">req</span>(ov<span class="sc">$</span>editing)</span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>        opt<span class="sc">$</span>strength[i] <span class="ot">&lt;-</span> input<span class="sc">$</span>strength</span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>    })</span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>    <span class="co"># Update stored type and overlay label when dropdown changes</span></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>    <span class="fu">observeEvent</span>(input<span class="sc">$</span>type, {</span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>        i <span class="ot">&lt;-</span> <span class="fu">req</span>(ov<span class="sc">$</span>editing)</span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>        opt<span class="sc">$</span>type[i] <span class="ot">&lt;-</span> input<span class="sc">$</span>type</span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>        ov<span class="sc">$</span>label[i] <span class="ot">&lt;-</span> input<span class="sc">$</span>type</span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>    })</span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>    </span></code></pre></div>
-<p>Above, we specify the “dates” label that will appear on the dropdown
-menus, and create some <code>observeEvent()</code>s that will update the
-<code>strength</code> and <code>type</code> elements of the
-<code>opt</code> <code>reactiveValues()</code> object we created earlier
-based on what is done in the dropdown menu. We also change the label of
-the overlay depending on what <code>type</code> is chosen from the
-menu.</p>
+menu depending on which overlay <code>i</code> is being edited.</p>
 <p>Now let’s make some data to plot based on the overlays and their
 properties:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>    <span class="co"># --- DATA PROCESSING BASED ON OVERLAY POSITION ---</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>    <span class="co"># Reactive dataset: oscillating signal modified by active overlays</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    data <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>        date_seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(input<span class="sc">$</span>date_range[<span class="dv">1</span>], input<span class="sc">$</span>date_range[<span class="dv">2</span>], <span class="at">by =</span> <span class="st">&quot;1 day&quot;</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>        y <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="fu">as.numeric</span>(date_seq) <span class="sc">/</span> <span class="dv">58</span>)  <span class="co"># oscillating signal</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>        <span class="co"># Modify signal according to active overlays if logic is enabled</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">isTRUE</span>(input<span class="sc">$</span>enable_logic)) {</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>            <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">which</span>(ov<span class="sc">$</span>active)) {</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>                start <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">round</span>(ov<span class="sc">$</span>cx0[i]), <span class="at">origin =</span> <span class="st">&quot;1970-01-01&quot;</span>)</span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>                end <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">round</span>(ov<span class="sc">$</span>cx1[i]), <span class="at">origin =</span> <span class="st">&quot;1970-01-01&quot;</span>)</span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>                in_range <span class="ot">&lt;-</span> date_seq <span class="sc">&gt;=</span> start <span class="sc">&amp;</span> date_seq <span class="sc">&lt;=</span> end</span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>                factor <span class="ot">&lt;-</span> opt<span class="sc">$</span>strength[i] <span class="sc">/</span> <span class="dv">100</span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>                y[in_range] <span class="ot">&lt;-</span> y[in_range] <span class="sc">*</span> <span class="cf">if</span> (ov<span class="sc">$</span>label[i] <span class="sc">==</span> <span class="st">&quot;Grow&quot;</span>) (<span class="dv">1</span> <span class="sc">+</span> factor) <span class="cf">else</span> (<span class="dv">1</span> <span class="sc">-</span> factor)</span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>            }</span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>        }</span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a></span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>        <span class="fu">data.frame</span>(<span class="at">date =</span> date_seq, <span class="at">y =</span> y)</span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>    })</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>    <span class="co"># --- DATA PROCESSING BASED ON OVERLAY POSITION ---</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>    <span class="co"># Reactive dataset: oscillating signal modified by active overlays</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    data <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>        date_seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(input<span class="sc">$</span>date_range[<span class="dv">1</span>], input<span class="sc">$</span>date_range[<span class="dv">2</span>], <span class="at">by =</span> <span class="st">&quot;1 day&quot;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>        y <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="fu">as.numeric</span>(date_seq) <span class="sc">/</span> <span class="dv">58</span>)  <span class="co"># oscillating signal</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>        <span class="co"># Modify signal according to active overlays if logic is enabled</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">isTRUE</span>(input<span class="sc">$</span>enable_logic)) {</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>            <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">which</span>(ov<span class="sc">$</span>active)) {</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>                start <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(ov<span class="sc">$</span>cx0[i], <span class="at">origin =</span> <span class="st">&quot;1970-01-01&quot;</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>                end <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(ov<span class="sc">$</span>cx1[i], <span class="at">origin =</span> <span class="st">&quot;1970-01-01&quot;</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>                in_range <span class="ot">&lt;-</span> date_seq <span class="sc">&gt;=</span> start <span class="sc">&amp;</span> date_seq <span class="sc">&lt;=</span> end</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>                factor <span class="ot">&lt;-</span> ov<span class="sc">$</span>data<span class="sc">$</span>strength[i] <span class="sc">/</span> <span class="dv">100</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>                y[in_range] <span class="ot">&lt;-</span> y[in_range] <span class="sc">*</span> <span class="cf">if</span> (ov<span class="sc">$</span>label[i] <span class="sc">==</span> <span class="st">&quot;Grow&quot;</span>) (<span class="dv">1</span> <span class="sc">+</span> factor) <span class="cf">else</span> (<span class="dv">1</span> <span class="sc">-</span> factor)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>            }</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>        }</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>        <span class="fu">data.frame</span>(<span class="at">date =</span> date_seq, <span class="at">y =</span> y)</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>    })</span></code></pre></div>
 <p>Above, we create a <code>reactive()</code> data.frame. We set up a
 sinusoidally-varying time series, then (if the “Enable overlay logic”
 checkbox is checked) we either “grow” or “shrink” this time series where
-it overlaps with each active overlay. We’re using both the
-<code>ov</code> object returned by <code>overlayServer()</code> and our
-own <code>opt</code> object to do this.</p>
+it overlaps with each active overlay. We’re using the <code>ov</code>
+object returned by <code>overlayServer()</code> to do this.</p>
 <p>Finally, we render the time series:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>    <span class="co"># --- RENDERING OF DATA ---</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>    <span class="co"># Render plot and align overlays to current axis limits</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    output<span class="sc">$</span>plot <span class="ot">&lt;-</span> <span class="fu">renderPlot</span>({</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>        plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">data</span>()) <span class="sc">+</span></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>            <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> y)) <span class="sc">+</span></span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>            <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>            <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">&quot;Signal&quot;</span>)</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>        <span class="fu">overlayBounds</span>(ov, plot,</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>            <span class="at">xlim =</span> <span class="fu">c</span>(input<span class="sc">$</span>date_range),</span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>            <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="cn">NA</span>))</span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>    })</span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>    <span class="co"># --- RENDERING OF DATA ---</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>    <span class="co"># Render plot and align overlays to current axis limits</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    output<span class="sc">$</span>display <span class="ot">&lt;-</span> <span class="fu">renderPlot</span>({</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>        plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">data</span>()) <span class="sc">+</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>            <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>            <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>            <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">&quot;Signal&quot;</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>        <span class="fu">overlayBounds</span>(ov, plot, <span class="at">xlim =</span> <span class="fu">c</span>(input<span class="sc">$</span>date_range), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="cn">NA</span>))</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>    })</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
 <p>This just creates a <code>ggplot()</code> plot of the time series,
 and includes a call to <code>overlayBounds()</code> at the end of the
 <code>renderPlot()</code> expression block to ensure the overlays are
 aligned properly. <code>overlayBounds()</code> itself returns the plot
 so this also returns our plot object to Shiny to be plotted.</p>
 <p>Now all that’s left is to run the app:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># --- Run app ---</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">interactive</span>()) {</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>    <span class="fu">shinyApp</span>(ui, server)</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># --- Run app ---</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">interactive</span>()) {</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>    <span class="fu">shinyApp</span>(ui, server)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>}</span></code></pre></div>
 
 
 
